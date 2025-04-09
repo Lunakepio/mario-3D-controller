@@ -5,6 +5,7 @@ import { CapsuleCollider, RigidBody, useRapier } from "@react-three/rapier";
 import { useKeyboardControls } from "@react-three/drei";
 import { MathUtils, Vector3 } from "three";
 import { useGameStore } from "./store/store";
+import { maxSpeed } from "./constants";
 
 export const PlayerController = () => {
   const playerRef = useRef();
@@ -54,7 +55,7 @@ export const PlayerController = () => {
     );
 
     if(ground.current){
-      speedRef.current = lerp(speedRef.current, forward ? 5 : 0, 4 * delta);
+      speedRef.current = lerp(speedRef.current, forward ? maxSpeed : 0, 4 * delta);
     }
 
     if (rbRef.current.linvel().y > 2 && !ground.current) {

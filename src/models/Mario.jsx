@@ -4,6 +4,7 @@ import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import { useGameStore } from '../store/store'
 import { LoopOnce } from 'three'
+import { maxSpeed } from '../constants'
 
 export const Mario = ({speedRef}) => {
   const group = useRef()
@@ -51,7 +52,7 @@ export const Mario = ({speedRef}) => {
   useFrame(() => {
     const animation = useGameStore.getState().playerAnimation
     if(timeScaleRef.current && currentAction.current){
-      const animationSpeed = 1 + 5 * speedRef.current / 5
+      const animationSpeed = 1 + 5 * speedRef.current / maxSpeed;
       currentAction.current.setEffectiveTimeScale(animation === "jump" ? 10 : animation === "land" ? 10 : animationSpeed)
     }
   })
