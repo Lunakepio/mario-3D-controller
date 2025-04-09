@@ -60,7 +60,7 @@ export const Mario = ({speedRef}) => {
   
   return (
     <group ref={group} dispose={null}>
-      <group name="Player" position={[0, -.7, 0]}>
+      <group name="Player" position={[0, -.8, 0]}>
         <group name="Player_1">
           <group name="Mario">
             <group name="AllRoot">
