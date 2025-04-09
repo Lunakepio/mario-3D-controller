@@ -11,7 +11,6 @@ export const Lighting = () => {
 
   useFrame(() => {
     const playerPosition = useGameStore.getState().playerPosition;
-    console.log(playerPosition)
     if (!playerPosition && !directionalLight.current) return;
 
     if(playerPosition){
