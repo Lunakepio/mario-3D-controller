@@ -8,7 +8,7 @@ import {
 } from "@react-three/drei";
 import { Physics, RigidBody } from "@react-three/rapier";
 import { Lighting } from "./Lighting";
-import { Dust } from "./particles/dust";
+import { Dust } from "./particles/Dust";
 
 function App() {
   const controls = [
@@ -26,7 +26,7 @@ function App() {
           <Suspense fallback={"loading..."}>
             <Lighting/>
             <Dust/>
-            <Physics timeStep={"vary"} debug gravity={[0, -9.81, 0]}>
+            <Physics timeStep={"vary"} gravity={[0, -9.81, 0]}>
               <KeyboardControls map={controls}>
                 <PlayerController />
               </KeyboardControls>

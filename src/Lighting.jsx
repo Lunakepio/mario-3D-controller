@@ -17,7 +17,7 @@ export const Lighting = () => {
     directionalLight.current.position.x = playerPosition.x - 1;
     directionalLight.current.target.position.x = playerPosition.x;
 
-    directionalLight.current.position.y = playerPosition.y + 5;
+    directionalLight.current.position.y = playerPosition.y + 10;
     directionalLight.current.target.position.y = playerPosition.y;
 
     directionalLight.current.position.z = playerPosition.z - 3;
