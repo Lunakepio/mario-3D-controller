@@ -65,10 +65,12 @@ export const PlayerController = () => {
       setPlayerAnimation("land");
       landingDuration -= delta;
     } else {
-      setPlayerAnimation(
-        speedRef.current > 2 ? "run" :
-        speedRef.current > 0.1 ? "walk" : "idle"
-      );
+      if(ground.current){
+        setPlayerAnimation(
+          speedRef.current > 2 ? "run" :
+          speedRef.current > 0.1 ? "walk" : "idle"
+        );
+      }
     }
     
 
