@@ -38,12 +38,12 @@ export const PlayerController = () => {
       return;
 
     const camera = state.camera;
-    const { forward, left, right, jump } = get();
+    const { forward, back, left, right, jump } = get();
 
     playerRef.current.rotation.y = lerp(
       playerRef.current.rotation.y,
-      playerRef.current.rotation.y + Number(left) - Number(right),
-      1 * delta
+      playerRef.current.rotation.y + Number(left) - Number(right) + (Number(back) * Math.PI),
+      3 * delta
     );
     const playerRotation = playerRef.current.rotation.y;
 
@@ -57,10 +57,11 @@ export const PlayerController = () => {
       speedRef.current = lerp(speedRef.current, forward ? 5 : 0, 4 * delta);
     }
 
-    if (rbRef.current.linvel().y > 0.1) {
+    if (rbRef.current.linvel().y > 2 && !ground.current) {
       setPlayerAnimation("jump");
-    } else if (rbRef.current.linvel().y < -0.1) {
+    } else if (rbRef.current.linvel().y < 2 && !ground.current) {
       setPlayerAnimation("fall");
+      rbRef.current.setGravityScale(2.1);
     } else if (hasJustLanded.current) {
       setPlayerAnimation("land");
       landingDuration -= delta;
@@ -70,6 +71,8 @@ export const PlayerController = () => {
           speedRef.current > 2 ? "run" :
           speedRef.current > 0.1 ? "walk" : "idle"
         );
+        rbRef.current.setGravityScale(1.2);
+
       }
     }
     
@@ -80,7 +83,7 @@ export const PlayerController = () => {
       z: 0,
     });
 
-    const raycastResult = world.castRay(
+    const raycastResult = world.castRayAndGetNormal(
       ray,
       1,
       false,
@@ -117,8 +120,8 @@ export const PlayerController = () => {
       z: forwardDirection.z * speedRef.current,
     });
 
-    if (jump && !isJumpHeld) {
-      rbRef.current.applyImpulse({ x: 0, y: 5, z: 0 }, true);
+    if (jump && !isJumpHeld && ground.current) {
+      rbRef.current.applyImpulse({ x: 0, y: 7, z: 0 }, true);
       isJumpHeld = true;
     }
 
@@ -130,14 +133,15 @@ export const PlayerController = () => {
 
     camera.position.lerp(
       cameraPositionRef.current.getWorldPosition(new Vector3()),
-      1 * delta
+      2 * delta
     );
     camera.lookAt(lookAtPositionRef.current.getWorldPosition(new Vector3()));
     setPlayerPosition(rbRef.current.translation());
+
   });
 
   return (
-    <RigidBody ccd colliders={false} ref={rbRef}>
+    <RigidBody ccd canSleep={false} colliders={false} ref={rbRef}>
       <CapsuleCollider args={[0.3, 0.5]} />
       <group ref={playerRef}>
         <group ref={cameraPositionRef} position={[0, 2, -6]} />

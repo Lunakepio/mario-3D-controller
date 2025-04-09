@@ -26,7 +26,7 @@ function App() {
           <Suspense fallback={"loading..."}>
             <Lighting/>
             <Dust/>
-            <Physics timeStep={"vary"} gravity={[0, -9.81, 0]}>
+            <Physics timeStep={"vary"} debug gravity={[0, -9.81, 0]}>
               <KeyboardControls map={controls}>
                 <PlayerController />
               </KeyboardControls>
