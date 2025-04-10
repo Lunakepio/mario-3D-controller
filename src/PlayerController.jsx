@@ -39,13 +39,21 @@ export const PlayerController = () => {
       return;
 
     const camera = state.camera;
+    const joystick = useGameStore.getState().joystick;
+    const jumpButtonPressed = useGameStore.getState().jumpButtonPressed;
     const { forward, back, left, right, jump } = get();
+
+
+    const forwardJoyStick = joystick.y > 0;
+const backwardJoystick = joystick.y < 0 ? -joystick.y : 0;
+const joystickInfluence = joystick.x * (1 + backwardJoystick);
 
     playerRef.current.rotation.y = lerp(
       playerRef.current.rotation.y,
-      playerRef.current.rotation.y + Number(left) - Number(right),
+      playerRef.current.rotation.y - joystickInfluence  + Number(left) - Number(right) ,
       3 * delta
     );
+
     const playerRotation = playerRef.current.rotation.y;
 
     const forwardDirection = new Vector3(
@@ -55,7 +63,9 @@ export const PlayerController = () => {
     );
 
     if(ground.current){
-      speedRef.current = lerp(speedRef.current, forward ? maxSpeed : 0, 4 * delta);
+      const joystickSpeed = (joystick.distance / 100) * maxSpeed;
+      speedRef.current = lerp(speedRef.current, forward ? maxSpeed : joystickSpeed  ? joystickSpeed : 0, 4 * delta);
+    
     }
 
     if (rbRef.current.linvel().y > 2 && !ground.current) {
@@ -121,12 +131,12 @@ export const PlayerController = () => {
       z: forwardDirection.z * speedRef.current,
     });
 
-    if (jump && !isJumpHeld && ground.current) {
+    if ((jump || jumpButtonPressed) && !isJumpHeld && ground.current) {
       rbRef.current.applyImpulse({ x: 0, y: 7, z: 0 }, true);
       isJumpHeld = true;
     }
 
-    if (!jump) {
+    if (!jump && !jumpButtonPressed) {
       isJumpHeld = false;
     }
 

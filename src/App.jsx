@@ -9,6 +9,7 @@ import {
 import { Physics, RigidBody } from "@react-three/rapier";
 import { Lighting } from "./Lighting";
 import { Dust } from "./particles/Dust";
+import { MobileControls } from "./mobile/MobileControls";
 
 function App() {
   const controls = [
@@ -22,6 +23,7 @@ function App() {
   return (
     <>
       <div className="canvas-container">
+        <MobileControls />
         <Canvas shadows>
           <Suspense fallback={"loading..."}>
             <Lighting/>
