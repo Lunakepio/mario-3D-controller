@@ -10,7 +10,6 @@ import { Physics, RigidBody } from "@react-three/rapier";
 import { Lighting } from "./Lighting";
 import { Dust } from "./particles/Dust";
 import { MobileControls } from "./mobile/MobileControls";
-import { Coin } from "./coins/Coin";
 import { Coins } from "./coins/Coins";
 
 function App() {
@@ -30,7 +29,6 @@ function App() {
           <Suspense fallback={"loading..."}>
             <Lighting/>
             <Dust/>
-            {/* <Coin/> */}
             <Physics timeStep={"vary"} gravity={[0, -9.81, 0]}>
             <Coins/>
               <KeyboardControls map={controls}>
