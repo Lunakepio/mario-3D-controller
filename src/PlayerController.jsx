@@ -140,7 +140,7 @@ const joystickInfluence = joystick.x * (1 + backwardJoystick);
       isJumpHeld = false;
     }
 
-    rbRef.current.setEnabledRotations(false, true, false, true);
+    rbRef.current.setEnabledRotations(false, false, false, true);
 
     camera.position.lerp(
       cameraPositionRef.current.getWorldPosition(new Vector3()),

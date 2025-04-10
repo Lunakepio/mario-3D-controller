@@ -2,8 +2,7 @@ import { InstancedMesh2 } from "@three.ez/instanced-mesh";
 import { extend, useFrame, useLoader } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import {
-  MeshPhongMaterial,
-  OctahedronGeometry,
+  MeshBasicMaterial,
   PlaneGeometry,
   Quaternion,
   TextureLoader,
@@ -17,7 +16,6 @@ extend({ InstancedMesh2 });
 export const Dust = () => {
   const ref = useRef(null);
   const lifeTime = 1;
-  const scaleMultiplier = -1;
   const speed = 1;
   const direction = new Vector3(0, 0.5, 0).normalize();
   let time = 0;
@@ -27,8 +25,8 @@ export const Dust = () => {
 
   const material = useMemo(
     () =>
-      new MeshPhongMaterial({
-        emissive: 0xffffff,
+      new MeshBasicMaterial({
+        color: 0xffffff,
         map: dustTexture,
         alphaMap: dustTexture,
         depthTest: false,
