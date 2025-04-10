@@ -23,7 +23,6 @@ export const Mario = ({speedRef}) => {
   
     const nextAction = actions[playerAnimation];
   
-  
     if (currentAction.current !== nextAction) {
       previousAction.current = currentAction.current;
       currentAction.current = nextAction;

@@ -5,4 +5,4 @@ export const useGameStore = create((set) => ({
   setPlayerPosition: (position) => set({ playerPosition: position }),
   playerAnimation: 'idle',
   setPlayerAnimation: (animation) => set({ playerAnimation: animation }),
-}));
+})) ;

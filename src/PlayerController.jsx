@@ -43,7 +43,7 @@ export const PlayerController = () => {
 
     playerRef.current.rotation.y = lerp(
       playerRef.current.rotation.y,
-      playerRef.current.rotation.y + Number(left) - Number(right) + (Number(back) * Math.PI),
+      playerRef.current.rotation.y + Number(left) - Number(right),
       3 * delta
     );
     const playerRotation = playerRef.current.rotation.y;
@@ -61,7 +61,7 @@ export const PlayerController = () => {
     if (rbRef.current.linvel().y > 2 && !ground.current) {
       setPlayerAnimation("jump");
     } else if (rbRef.current.linvel().y < 2 && !ground.current) {
-      setPlayerAnimation("fall");
+      setPlayerAnimation("jump");
       rbRef.current.setGravityScale(2.1);
     } else if (hasJustLanded.current) {
       setPlayerAnimation("land");
