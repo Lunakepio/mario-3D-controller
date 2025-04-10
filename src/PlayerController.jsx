@@ -90,7 +90,7 @@ const joystickInfluence = joystick.x * (1 + backwardJoystick);
 
     const ray = new rapier.Ray(rbRef.current.translation(), {
       x: 0,
-      y: -1,
+      y: -2,
       z: 0,
     });
 
