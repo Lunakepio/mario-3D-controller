@@ -15,6 +15,7 @@
     "@react-three/fiber": "^9.1.2",
     "@react-three/rapier": "^2.1.0",
     "@three.ez/instanced-mesh": "^0.3.1",
+    "r3f-perf": "^7.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-joystick-component": "^6.2.1",

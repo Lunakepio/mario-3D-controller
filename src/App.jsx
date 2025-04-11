@@ -11,6 +11,8 @@ import { Lighting } from "./Lighting";
 import { Dust } from "./particles/Dust";
 import { MobileControls } from "./mobile/MobileControls";
 import { Coins } from "./coins/Coins";
+import { Coins2 } from "./coins/Coins2";
+import { Perf } from "r3f-perf";
 
 function App() {
   const controls = [
@@ -26,14 +28,17 @@ function App() {
       <div className="canvas-container">
         <MobileControls />
         <Canvas shadows>
+          <Perf/>
           <Suspense fallback={"loading..."}>
             <Lighting/>
             <Dust/>
             <Physics timeStep={"vary"} gravity={[0, -9.81, 0]}>
-            <Coins/>
-              <KeyboardControls map={controls}>
+            {/* <Coins/> */}
+            <OrbitControls/>
+            <Coins2/>
+              {/* <KeyboardControls map={controls}>
                 <PlayerController />
-              </KeyboardControls>
+              </KeyboardControls> */}
               <RigidBody type="fixed" name="ground" userData={{ ground : true}}>
                 <mesh castShadow receiveShadow position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
                   <planeGeometry args={[50, 50]} />

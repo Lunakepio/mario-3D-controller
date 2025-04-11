@@ -6,16 +6,16 @@ import { InstancedMesh2 } from "@three.ez/instanced-mesh";
 import { extend } from "@react-three/fiber";
 extend({ InstancedMesh2 });
 
-export const Coins = ({ count = 1000, rand = MathUtils.randFloatSpread }) => {
+export const Coins3 = ({ count = 1000, rand = MathUtils.randFloatSpread }) => {
   const { nodes, materials } = useGLTF("/models/items/coin.glb");
   const ref = useRef(null);
   const instancedMeshRef = useRef(null);
-  const instances = Array.from({ length: count }, (_, i) => ({
+  const [instances, setInstances] = useState(Array.from({ length: count }, (_, i) => ({
     key: i,
     position: [rand(10), 10 + i / 2, rand(10)],
     rotation: [Math.random(), Math.random(), Math.random()],
     index: i,
-  }));
+  })));
 
   useEffect(() => {
     if (instancedMeshRef.current) {
