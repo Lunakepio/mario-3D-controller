@@ -19,6 +19,7 @@
     "react-dom": "^19.0.0",
     "react-joystick-component": "^6.2.1",
     "three": "^0.175.0",
+    "three-custom-shader-material": "^6.3.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

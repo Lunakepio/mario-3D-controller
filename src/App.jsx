@@ -11,6 +11,7 @@ import { Lighting } from "./Lighting";
 import { Dust } from "./particles/Dust";
 import { MobileControls } from "./mobile/MobileControls";
 import { Coins } from "./coins/Coins";
+import { Luma } from "./models/Luma";
 
 function App() {
   const controls = [
@@ -29,8 +30,9 @@ function App() {
           <Suspense fallback={"loading..."}>
             <Lighting/>
             <Dust/>
+            <Luma />
             <Physics timeStep={"vary"} gravity={[0, -9.81, 0]}>
-            <Coins/>
+            {/* <Coins/> */}
               <KeyboardControls map={controls}>
                 <PlayerController />
               </KeyboardControls>
