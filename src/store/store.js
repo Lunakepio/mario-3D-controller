@@ -1,4 +1,4 @@
-import { Vector2 } from "three";
+import { Vector3 } from "three";
 import { create } from "zustand";
 
 export const useGameStore = create((set) => ({
@@ -10,4 +10,6 @@ export const useGameStore = create((set) => ({
   setJoystick: (joystick) => set({ joystick: joystick }),
   jumpButtonPressed: false,
   setJumpButtonPressed: (pressed) => set({ jumpButtonPressed: pressed }),
+  lookAtCharacter: new Vector3(),
+  setLookAtCharacter: (lookAtCharacter) => set({ lookAtCharacter: lookAtCharacter }),
 }));
