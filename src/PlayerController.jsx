@@ -41,12 +41,12 @@ export const PlayerController = () => {
     const camera = state.camera;
     const joystick = useGameStore.getState().joystick;
     const jumpButtonPressed = useGameStore.getState().jumpButtonPressed;
+    const lookAtCharacter = useGameStore.getState().lookAtCharacter;
     const { forward, back, left, right, jump } = get();
 
 
-    const forwardJoyStick = joystick.y > 0;
-const backwardJoystick = joystick.y < 0 ? -joystick.y : 0;
-const joystickInfluence = joystick.x * (1 + backwardJoystick);
+    const backwardJoystick = joystick.y < 0 ? -joystick.y : 0;
+    const joystickInfluence = joystick.x * (1 + backwardJoystick);
 
     playerRef.current.rotation.y = lerp(
       playerRef.current.rotation.y,
@@ -146,6 +146,7 @@ const joystickInfluence = joystick.x * (1 + backwardJoystick);
       cameraPositionRef.current.getWorldPosition(new Vector3()),
       2 * delta
     );
+    
     camera.lookAt(lookAtPositionRef.current.getWorldPosition(new Vector3()));
     setPlayerPosition(rbRef.current.translation());
 

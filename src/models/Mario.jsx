@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useGraph, useFrame } from '@react-three/fiber'
-import { useGLTF, useAnimations } from '@react-three/drei'
+import { useGLTF, useAnimations, Billboard } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import { useGameStore } from '../store/store'
 import { LoopOnce } from 'three'
@@ -52,13 +52,14 @@ export const Mario = ({speedRef}) => {
     const animation = useGameStore.getState().playerAnimation
     if(timeScaleRef.current && currentAction.current){
       const animationSpeed = 1 + 5 * speedRef.current / maxSpeed;
-      currentAction.current.setEffectiveTimeScale(animation === "jump" ? 10 : animation === "land" ? 10 : animationSpeed)
+      currentAction.current.setEffectiveTimeScale(animation === "jump" ? 20 : animation === "land" ? 10 : animationSpeed)
     }
   })
 
   
   return (
     <group ref={group} dispose={null}>
+
       <group name="Player" position={[0, -.8, 0]}>
         <group name="Player_1">
           <group name="Mario">

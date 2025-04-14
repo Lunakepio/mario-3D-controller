@@ -29,7 +29,7 @@ export const Dust = () => {
         color: 0xffffff,
         map: dustTexture,
         alphaMap: dustTexture,
-        depthTest: false,
+        depthWrite: false,
         transparent: true,
       }),
     [dustTexture]

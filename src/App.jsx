@@ -5,12 +5,15 @@ import {
   OrbitControls,
   Environment,
   KeyboardControls,
+  Stats,
 } from "@react-three/drei";
 import { Physics, RigidBody } from "@react-three/rapier";
 import { Lighting } from "./Lighting";
 import { Dust } from "./particles/Dust";
 import { MobileControls } from "./mobile/MobileControls";
 import { Coins } from "./coins/Coins";
+import { Luma } from "./models/Luma/Luma";
+import { Composer } from "./Composer";
 
 function App() {
   const controls = [
@@ -26,11 +29,14 @@ function App() {
       <div className="canvas-container">
         <MobileControls />
         <Canvas shadows>
+          <color attach="background" args={["#FF5E41"]} />
           <Suspense fallback={"loading..."}>
+            {/* <Composer/> */}
             <Lighting/>
             <Dust/>
+            <Luma />
             <Physics timeStep={"vary"} gravity={[0, -9.81, 0]}>
-            <Coins/>
+            {/* <Coins/> */}
               <KeyboardControls map={controls}>
                 <PlayerController />
               </KeyboardControls>
@@ -42,8 +48,9 @@ function App() {
               </RigidBody>
             </Physics>
           </Suspense>
+          <Stats/>
           {/* <OrbitControls /> */}
-          <Environment preset="warehouse" />
+          <Environment preset="warehouse"/>
         </Canvas>
       </div>
     </>
