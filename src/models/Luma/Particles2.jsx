@@ -8,7 +8,6 @@ import {
 import { useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { Billboard } from "@react-three/drei";
-import PropTypes from "prop-types";
 
 const vertexShader = /* glsl */ `
 attribute float size;
@@ -100,8 +99,4 @@ export const Particles2 = () => {
       </mesh>
     </Billboard>
   );
-};
-
-Particles2.propTypes = {
-  noiseTexture: PropTypes.object,
 };

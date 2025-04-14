@@ -10,7 +10,7 @@ import { Particles2 } from "./Particles2";
 import { useGameStore } from "../../store/store";
 import { vec3 } from "@react-three/rapier";
 
-export function Luma(props) {
+export function Luma() {
   const group = useRef();
   const { scene, animations } = useGLTF("./models/npc/luma.glb");
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
@@ -129,7 +129,6 @@ const defaultLookAt = new Vector3(0, -1, 0);
   return (
     <group
       ref={group}
-      {...props}
       position={[0, -1, 5]}
       dispose={null}
       scale={1.4}

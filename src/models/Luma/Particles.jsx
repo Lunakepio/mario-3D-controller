@@ -7,7 +7,6 @@ import {
 } from "three";
 import { useRef, useMemo } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
-import PropTypes from "prop-types";
 
 const vertexShader = /* glsl */ `
 attribute float size;
@@ -168,8 +167,4 @@ export const Particles = ({ noiseTexture }) => {
       />
     </points>
   );
-};
-
-Particles.propTypes = {
-  noiseTexture: PropTypes.object,
 };
