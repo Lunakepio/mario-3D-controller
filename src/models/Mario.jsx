@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useGraph, useFrame } from '@react-three/fiber'
-import { useGLTF, useAnimations, Billboard } from '@react-three/drei'
+import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import { useGameStore } from '../store/store'
 import { LoopOnce } from 'three'
@@ -14,48 +14,41 @@ export const Mario = ({speedRef}) => {
   const { actions } = useAnimations(animations, group)
 
   const currentAction = useRef()
-  const previousAction = useRef()
-  const playerAnimation = useGameStore((state) => state.playerAnimation)
-
-  const timeScaleRef = useRef(1);
-  useEffect(() => {
-    if (!playerAnimation || !actions[playerAnimation]) return;
-  
-    const nextAction = actions[playerAnimation];
-  
-    if (currentAction.current !== nextAction) {
-      previousAction.current = currentAction.current;
-      currentAction.current = nextAction;
-  
-      if (previousAction.current) {
-        previousAction.current.fadeOut(0.2);
-      }
-  
-      // const timeScale = playerAnimation === "idle" ? 1 : playerAnimation === "walk" ? 3 : playerAnimation === "run" ? 4 : 1;
-  
-      currentAction.current
-        .reset()
-        .fadeIn(0.2)
-        // .setEffectiveTimeScale(timeScale)
-        .play();
-  
-
-      if (playerAnimation === "jump" || playerAnimation === "land") {
-        currentAction.current.loop = LoopOnce;
-        currentAction.current.clampWhenFinished = true;
-      }
-    }
-  }, [playerAnimation, actions]);
-  
 
   useFrame(() => {
-    const animation = useGameStore.getState().playerAnimation
-    if(timeScaleRef.current && currentAction.current){
-      const animationSpeed = 1 + 5 * speedRef.current / maxSpeed;
-      currentAction.current.setEffectiveTimeScale(animation === "jump" ? 20 : animation === "land" ? 10 : animationSpeed)
-    }
-  })
+    const animation = useGameStore.getState().playerAnimation;
+    const nextAction = actions[animation];
+  
+    if (!nextAction) return;
+  
+    if (currentAction.current !== nextAction) {
+      if (currentAction.current) {
+        currentAction.current.fadeOut(0.2);
+      }
 
+      currentAction.current = nextAction;
+  
+      if (animation === "jump" || animation === "land") {
+        nextAction.loop = LoopOnce;
+        nextAction.clampWhenFinished = true;
+      } else {
+        nextAction.loop = undefined;
+        nextAction.clampWhenFinished = false;
+      }
+  
+      nextAction.reset().fadeIn(0.2).play();
+    }
+
+    if (currentAction.current) {
+      const animationSpeed =
+        animation === "jump"
+          ? 20
+          : animation === "land"
+          ? 10
+          : 1 + 5 * speedRef.current / maxSpeed;
+      currentAction.current.setEffectiveTimeScale(animationSpeed);
+    }
+  });
   
   return (
     <group ref={group} dispose={null}>
