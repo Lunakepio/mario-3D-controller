@@ -14,13 +14,13 @@ export const Lighting = () => {
     if (!playerPosition && !directionalLight.current) return;
 
     if(playerPosition){
-    directionalLight.current.position.x = playerPosition.x - 1;
+    directionalLight.current.position.x = playerPosition.x + 5;
     directionalLight.current.target.position.x = playerPosition.x;
 
     directionalLight.current.position.y = playerPosition.y + 5;
     directionalLight.current.target.position.y = playerPosition.y;
 
-    directionalLight.current.position.z = playerPosition.z - 3;
+    directionalLight.current.position.z = playerPosition.z + 5;
     directionalLight.current.target.position.z = playerPosition.z;
 
     directionalLight.current.target.updateMatrixWorld();
@@ -29,26 +29,27 @@ export const Lighting = () => {
 
   return (
     <>
+    <ambientLight intensity={3} color={"#ccccff"} />
       <directionalLight
       castShadow
       ref={directionalLight}
       position={[0, 0, 0]}
-      intensity={5}
-      color={"#add8e6"}
+      intensity={1}
+      color={"#9cf5ff"}
       // shadow-normalBias={0.04}
       shadow-bias={-0.001}
-      shadow-mapSize={[512, 512]}
+      shadow-mapSize={[1024, 1024]}
       // layers={1}
       
     >
       <orthographicCamera
         attach="shadow-camera"
         near={1}
-        far={10}
-        top={10}
-        right={10}
-        left={-10}
-        bottom={-10}
+        far={30}
+        top={30}
+        right={30}
+        left={-30}
+        bottom={-30}
       >
         {/* <Helper type={CameraHelper} /> */}
       </orthographicCamera>

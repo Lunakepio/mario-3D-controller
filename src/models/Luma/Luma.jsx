@@ -175,14 +175,17 @@ const defaultLookAt = new Vector3(0, -1, 0);
                     >
                       <Glow />
                       <Particles noiseTexture={noiseTexture} />
+                      <pointLight position={[0, 0, 0]} intensity={4} color={"#ff4400"} />
                     </primitive>
                     <skinnedMesh
+                    castShadow
                       name="Object_10"
                       geometry={nodes.Object_10.geometry}
                       material={materials.material}
                       skeleton={nodes.Object_10.skeleton}
                     />
                     <skinnedMesh
+                    castShadow
                       name="Object_9"
                       geometry={nodes.Object_9.geometry}
                       material={lumaMaterial}

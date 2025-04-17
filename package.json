@@ -16,6 +16,7 @@
     "@react-three/postprocessing": "^3.0.4",
     "@react-three/rapier": "^2.1.0",
     "@three.ez/instanced-mesh": "^0.3.1",
+    "gsap": "^3.12.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-joystick-component": "^6.2.1",

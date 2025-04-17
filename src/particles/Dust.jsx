@@ -77,7 +77,7 @@ export const Dust = () => {
         const pz = z + dir.z * radius + (Math.random() - 0.5) * 0.5;
 
         ref.current.addInstances(1, (obj) => {
-          obj.position.set(px, y - 0.7, pz);
+          obj.position.set(px, y - 0.9, pz);
           // obj.quaternion.random();
           const scale = Math.random() + 1;
           obj.scale.set(scale, scale, scale);
