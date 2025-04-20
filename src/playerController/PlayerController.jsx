@@ -1,6 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 import Mario from "../models/mario/Mario";
 
@@ -8,13 +8,14 @@ import { CapsuleCollider, RigidBody, useRapier } from "@react-three/rapier";
 
 import { useKeyboardControls } from "@react-three/drei";
 
-import { MathUtils, Vector3 } from "three";
+import { MathUtils, Vector3, Quaternion, Euler } from "three";
 
 import { useGameStore } from "../store/store";
 
 import { maxSpeed } from "../constants";
 
 import { lerp } from "three/src/math/MathUtils.js";
+import { VFXEmitter } from "wawa-vfx";
 
 export const PlayerController = () => {
   const playerRef = useRef();
@@ -25,6 +26,7 @@ export const PlayerController = () => {
   const { world, rapier } = useRapier();
   const ground = useRef(null);
   const hasJustLanded = useRef(false);
+  const marioRef = useRef();
 
   const setPlayerAnimation = useGameStore((state) => state.setPlayerAnimation);
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
@@ -36,6 +38,7 @@ export const PlayerController = () => {
 
   const getPlayerInputs = (get) => {
     const { joystick, jumpButtonPressed } = useGameStore.getState();
+
     const { forward, left, right, jump } = get();
     const backwardJoystick = joystick.y < 0 ? -joystick.y : 0;
     const joystickInfluence = joystick.x * (1 + backwardJoystick);
@@ -74,7 +77,7 @@ export const PlayerController = () => {
 
       const wasGrounded = ground.current;
 
-      ground.current = Boolean(userData);
+      ground.current = Boolean(userData?.ground);
 
       if (!wasGrounded && ground.current) {
         hasJustLanded.current = true;
@@ -94,6 +97,8 @@ export const PlayerController = () => {
 
   const movePlayer = (delta, inputs) => {
     const { forward, joystickSpeed, left, right, joystickInfluence } = inputs;
+    const { curvePointData, star } = useGameStore.getState();
+    if (curvePointData || star) return;
     playerRef.current.rotation.y = lerp(
       playerRef.current.rotation.y,
 
@@ -133,7 +138,11 @@ export const PlayerController = () => {
     );
   };
 
-  const animateMario = (delta) => {
+  const animateMario = (curvePointData, delta) => {
+    if (curvePointData) {
+      setPlayerAnimation("fall");
+      return;
+    }
     if (rbRef.current.linvel().y > 2 && !ground.current) {
       setPlayerAnimation("jump");
     } else if (rbRef.current.linvel().y < 2 && !ground.current) {
@@ -151,20 +160,39 @@ export const PlayerController = () => {
             ? "walk"
             : "idle"
         );
-        rbRef.current.setGravityScale(1.2);
+        rbRef.current.setGravityScale(1);
       }
     }
   };
 
   const updatePlayerPosition = () => {
     rbRef.current.setEnabledRotations(false, false, false, true);
+    const { curvePointData, star } = useGameStore.getState();
 
-    setPlayerPosition(rbRef.current.translation());
+    if (!curvePointData && !star) {
+      setPlayerPosition(rbRef.current.translation());
+    } else {
+      rbRef.current.setTranslation(
+        {
+          x: playerRef.current.position.x,
+          y: playerRef.current.position.y,
+          z: playerRef.current.position.z,
+        },
+        true
+      );
+      rbRef.current.setLinvel({
+        x: 0,
+        y: 0,
+        z: 0,
+      });
+      rbRef.current.setGravityScale(0);
+      speedRef.current = 0;
+    }
   };
 
   const manageJump = (jump, jumpButtonPressed) => {
     if ((jump || jumpButtonPressed) && !isJumpHeld.current && ground.current) {
-      rbRef.current.applyImpulse({ x: 0, y: 7, z: 0 }, true);
+      rbRef.current.applyImpulse({ x: 0, y: 8, z: 0 }, true);
 
       isJumpHeld.current = true;
     }
@@ -174,16 +202,67 @@ export const PlayerController = () => {
     }
   };
 
-  const updateCamera = (camera, delta) => {
-    camera.position.lerp(
-      cameraPositionRef.current.getWorldPosition(new Vector3()),
-      2 * delta
-    );
+  const updateCamera = (camera, delta, curvePointData, star) => {
+    if (curvePointData) {
+      const targetPos = curvePointData.getWorldPosition(new Vector3());
 
+      const offset = new Vector3(5, 6, 0);
+
+      const cameraTarget = targetPos.clone().add(offset);
+
+      camera.position.lerp(cameraTarget, 1 * delta);
+    } else if (star) {
+      const starPosition = star.getWorldPosition(new Vector3());
+      const offset = new Vector3(-8, 10, 0);
+
+      const cameraTarget = starPosition.clone().add(offset);
+
+      camera.position.lerp(cameraTarget, 1 * delta);
+    } else {
+      camera.position.lerp(
+        cameraPositionRef.current.getWorldPosition(new Vector3()),
+        2 * delta
+      );
+    }
     camera.lookAt(lookAtPositionRef.current.getWorldPosition(new Vector3()));
   };
 
-  
+  const animateThroughPath = (delta) => {
+    const { curvePointData, star } = useGameStore.getState();
+    if (curvePointData) {
+      const position = curvePointData.getWorldPosition(new Vector3());
+      const quat = curvePointData.getWorldQuaternion(new Quaternion());
+      playerRef.current.position.lerp(position, 8 * delta);
+      playerRef.current.quaternion.slerp(quat, 12 * delta);
+    } else {
+      if (star) {
+        const starPosition = star.getWorldPosition(new Vector3());
+        const starQuat = star.getWorldQuaternion(new Quaternion());
+        playerRef.current.position.lerp(starPosition, 8 * delta);
+        playerRef.current.quaternion.slerp(starQuat, 12 * delta);
+      } else {
+        playerRef.current.rotation.x = lerp(
+          playerRef.current.rotation.x,
+          0,
+          8 * delta
+        );
+        playerRef.current.rotation.z = lerp(
+          playerRef.current.rotation.z,
+          0,
+          8 * delta
+        );
+      }
+    }
+  };
+
+  const resetPosition = () => {
+    if (rbRef.current.translation().y < -10) {
+      rbRef.current.setTranslation({ x: 0, y: 2, z: 0 }, true);
+      rbRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      speedRef.current = 0;
+    }
+  };
+
   useFrame((state, delta) => {
     if (
       !playerRef.current ||
@@ -195,7 +274,7 @@ export const PlayerController = () => {
 
     const camera = state.camera;
 
-    const { starPosition } = useGameStore.getState();
+    const { star, curvePointData } = useGameStore.getState();
 
     const {
       forward,
@@ -215,22 +294,52 @@ export const PlayerController = () => {
       joystickInfluence,
       joystickSpeed,
     });
-    animateMario(delta);
+    animateMario(curvePointData, delta);
+    animateThroughPath(delta);
 
     manageJump(jump, jumpButtonPressed);
-    updateCamera(camera, delta);
+    updateCamera(camera, delta, curvePointData, star);
     updatePlayerPosition();
+    resetPosition();
   });
 
   return (
     <>
       <RigidBody ccd canSleep={false} colliders={false} ref={rbRef}>
         <CapsuleCollider args={[0.3, 0.5]} />
+        {/* <VFXEmitter
+          emitter="flying"
+          debug={true}
+          settings={{
+            duration: 4,
+            delay: 1,
+            nbParticles: 1000,
+            spawnMode: "time",
+            loop: true,
+            startPositionMin: [-0.3, -0.6, -0.3],
+            startPositionMax: [0.3, 0.6, 0.3],
+            startRotationMin: [0, 0, 0],
+            startRotationMax: [0, 0, 0],
+            particlesLifetime: [0.1, 5.9],
+            speed: [0, 0],
+            directionMin: [-0, -0, -0],
+            directionMax: [0, 0, 0],
+            rotationSpeedMin: [0, 0, 0],
+            rotationSpeedMax: [0, 0, 0],
+            colorStart: ["#ffffff"],
+            colorEnd: ["#ffffff"],
+            size: [0.01, 0.04999999999999993],
+          }}
+        /> */}
       </RigidBody>
-      <group ref={playerRef}>
+
+      <group rotation-y={Math.PI} ref={playerRef}>
         <group ref={cameraPositionRef} position={[0, 2, -6]} />
         <group ref={lookAtPositionRef} />
-        <Mario speedRef={speedRef} />
+
+        <group ref={marioRef}>
+          <Mario speedRef={speedRef} />
+        </group>
       </group>
     </>
   );

@@ -137,19 +137,22 @@ const Mario = ({speedRef}) => {
           : 1 + 5 * speedRef.current / maxSpeed;
       currentAction.current.setEffectiveTimeScale(animationSpeed);
     }
-    twirlAnimationRef.current.time(twirlProgress);
-    if(twirlProgress < 0.6 && shouldTwirl ){
-      twirlProgress += delta;
+    if(twirlAnimationRef.current){
+      twirlAnimationRef.current.time(twirlProgress);
+      if(twirlProgress < 0.6 && shouldTwirl ){
+        twirlProgress += delta;
+      }
+      if(twirlProgress > 0.6){
+        shouldTwirl = false;
+      }
+      if(twirl){
+        shouldTwirl = true
+        twirlProgress = 0;
+      }
+  
+      setIsTwirling(shouldTwirl)
     }
-    if(twirlProgress > 0.6){
-      shouldTwirl = false;
-    }
-    if(twirl){
-      shouldTwirl = true
-      twirlProgress = 0;
-    }
-
-    setIsTwirling(shouldTwirl)
+   
 
   });
   

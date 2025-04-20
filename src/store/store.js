@@ -12,8 +12,10 @@ export const useGameStore = create((set) => ({
   setJumpButtonPressed: (pressed) => set({ jumpButtonPressed: pressed }),
   lookAtCharacter: new Vector3(),
   setLookAtCharacter: (lookAtCharacter) => set({ lookAtCharacter: lookAtCharacter }),
-  starPosition: null,
-  setStarPosition: (starPosition) => set({ starPosition: starPosition }),
+  star: null,
+  setStar: (star) => set({ star: star}),
   isTwirling: null,
   setIsTwirling: (isTwirling) => set({ isTwirling : isTwirling}),
+  curvePointData: null,
+  setCurvePointData: (curvePointData) => set({ curvePointData: curvePointData }),
 }));

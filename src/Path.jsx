@@ -3,6 +3,8 @@ import { CatmullRomCurve3, Vector3 } from "three";
 import { curve as points } from "./data";
 import gsap from "gsap";
 import { CustomEase } from "gsap/all";
+import { useFrame } from "@react-three/fiber";
+import { useGameStore } from "./store/store";
 
 export const Path = ({color = "white", lineWidth = 1 }) => {
 
@@ -11,7 +13,7 @@ export const Path = ({color = "white", lineWidth = 1 }) => {
   const meshRef = useRef();
 
 
-  const curvePoints = useMemo(() => curve.getPoints(100), [curve]);
+  const curvePoints = useMemo(() => curve.getPoints(points.length), [curve]);
 
 
   const positions = useMemo(
@@ -19,49 +21,77 @@ export const Path = ({color = "white", lineWidth = 1 }) => {
     [curvePoints]
   );
 
+  const animation = useRef(null);
+  const groupRef = useRef(null);
+  const tweenProgress = useRef(0);
+
+  const setCurvePointData = useGameStore((state) => state.setCurvePointData);
   useEffect(() => {
     if (!meshRef.current) return;
   
-    const curveLength = curve.getLength();
+    // const curveLength = curve.getLength();
   
     const data = { progress: 0 };
-  
-    const animation = gsap.to(data, {
+    
+    const tl = gsap.timeline({paused: true});
+    tl.to(data, {
       progress: 1,
       duration: 4,
-      ease: CustomEase.create("custom", "M0,0 C0.157,0.393 0.891,0.561 1,1.029 "),
-      delay: 2,
-      paused: true,
+      delay: 1.1,
+      ease: CustomEase.create("custom", "M0,0 C0.157,0.393 0.891,0.561 1,1."),
       onUpdate: () => {
-        const pointOnCurve = curve.getPointAt(data.progress);
-  
-        meshRef.current.position.set(
+        const clampedProgress = Math.min(1, Math.max(0, data.progress)); // Clamp progress
+    
+        const pointOnCurve = curve.getPointAt(clampedProgress);
+    
+        setCurvePointData(meshRef.current);
+        groupRef.current.position.set(
           pointOnCurve.x,
           pointOnCurve.y,
-          pointOnCurve.z,
+          pointOnCurve.z
         );
-  
-        const tangent = curve.getTangentAt(data.progress);
+    
+        const tangent = curve.getTangentAt(clampedProgress);
         const lookAtVector = new Vector3().addVectors(pointOnCurve, tangent);
-        meshRef.current.lookAt(lookAtVector);
+        groupRef.current.lookAt(lookAtVector);
       },
       onComplete: () => {
-        console.log('Animation complete!');
+        setCurvePointData(null);
       },
-    });
-  
+    }, 0);
+    tl.to(meshRef.current.rotation, {y: Math.PI * 8, duration:2.5, delay: 1.1, ease: "power4.out"}, 0);
+    tl.to(meshRef.current.rotation, {x: Math.PI * 4, duration:0.5, delay: 4.1, ease: CustomEase.create("custom", "M0,0 C0.157,0.393 0.891,0.561 1,1.")}, 0);
+    
+
+    
+    // Store timeline in ref if needed
+    animation.current = tl;
+    
+    // Clean up on unmount
     return () => {
-      animation.kill();
+      tl.kill();
     };
   }, [curve]);
+
+  useFrame((state, delta) => {
+    if(animation.current){
+      const { star } = useGameStore.getState();
+      if(star && star.isTwirling){
+        // tweenProgress.current += delta;
+        animation.current.play();
+  
+      }
+    }
+  });
     
   return (
     <>
-    <mesh ref={meshRef}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={color} />
-    </mesh>
-    <line>
+    <group ref={groupRef} position={curve.getPointAt(0)}>
+    <group ref={meshRef} rotation={[Math.PI / 2, 0 , 0]}>
+
+    </group>
+    </group>
+    {/* <line>
       <bufferGeometry attach="geometry">
         <bufferAttribute
           attach="attributes-position"
@@ -75,7 +105,7 @@ export const Path = ({color = "white", lineWidth = 1 }) => {
         color={color}
         linewidth={lineWidth}
       />
-    </line>
+    </line> */}
     </>
   );
 };

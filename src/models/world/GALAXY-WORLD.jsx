@@ -6,14 +6,74 @@ Command: npx gltfjsx@6.5.3 --shadows GALAXY-WORLD.glb
 import { useGLTF } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 import { LaunchStar } from "../launchStar/LaunchStar";
-import { Vector3 } from "three";
+import { Color } from "three";
+import { useEffect } from "react";
+import CSM from "three-custom-shader-material/vanilla";
+
+const vertexShader = /* glsl */ `
+varying vec2 vUv;
+varying vec3 vNormalView;
+varying vec3 vPosition;
+
+void main() {
+  vUv = uv;
+  vPosition = position;
+
+  vNormalView = normalize((viewMatrix * modelMatrix * vec4(normal, 0.0)).xyz);
+  csm_PositionRaw = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+}
+`;
+
+const fragmentShader = /* glsl */ `
+uniform vec3 fresnelColor;
+uniform float fresnelPower;
+uniform float fresnelIntensity;
+
+
+varying vec2 vUv;
+varying vec3 vNormalView;
+varying vec3 vPosition;
+
+
+void main() {
+
+  vec3 viewDir = vec3(0.0, 0.0, 1.0);
+  float fresnelRaw = 1.0 - dot(normalize(vNormalView), viewDir);
+  float fresnel = smoothstep(0.3, 1.0, fresnelRaw) * fresnelIntensity;
+
+  vec3 baseColor = texture2D(map, vUv).rgb;
+  vec3 finalColor = mix(baseColor, fresnelColor, fresnel);
+
+
+  csm_DiffuseColor = vec4(finalColor, 1.0);
+}
+
+`;
 
 export function World(props) {
   const { nodes, materials } = useGLTF("/models/world/GALAXY-WORLD.glb");
 
+  useEffect(() => {
+    for (const key in materials) {
+      const originalMat = materials[key];
+
+      materials[key] = new CSM({
+        baseMaterial: originalMat,
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          fresnelColor: { value: new Color(0xffffff) },
+          fresnelPower: { value: 8 },
+          fresnelIntensity: { value: 0.1 },
+          cameraPosition: { value: new Color() },
+        },
+      });
+    }
+  }, [materials]);
+
   return (
     <group {...props} position-y={-1} dispose={null}>
-      <group position={[-2, 2, -2.1]} >
+      <group position={[-2, 2, -2.1]}>
         <LaunchStar />
       </group>
       <RigidBody
@@ -35,30 +95,20 @@ export function World(props) {
           material={materials.BlockEmptyMat00}
         />
 
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={nodes.Icosphere002.geometry}
-          material={nodes.Icosphere002.material}
-        />
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={nodes.Icosphere003.geometry}
-          material={nodes.Icosphere003.material}
-        />
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={nodes.BlockQuestion__BlockQuestionMat01027_1.geometry}
-          material={materials.BlockQuestionMat01}
-        />
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={nodes.BlockQuestion__BlockQuestionMat01027_2.geometry}
-          material={materials.BlockQuestionMat00}
-        />
+        <group position-z={3}>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={nodes.BlockQuestion__BlockQuestionMat01027_1.geometry}
+            material={materials.BlockQuestionMat01}
+          />
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={nodes.BlockQuestion__BlockQuestionMat01027_2.geometry}
+            material={materials.BlockQuestionMat00}
+          />
+        </group>
         <mesh
           castShadow
           receiveShadow

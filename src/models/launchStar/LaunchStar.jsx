@@ -24,7 +24,7 @@ export function LaunchStar(props) {
   const idle = useRef(true);
   const tweenProgress = useRef(0)
 
-  const setStarPosition = useGameStore((state) => state.setStarPosition);
+  const setStar = useGameStore((state) => state.setStar);
   const delay = useRef(2)
   useEffect(() => {
       
@@ -43,23 +43,23 @@ export function LaunchStar(props) {
   }, [])
   useFrame((state, delta) => {
     time.current += delta;
-    const {starPosition, isTwirling } = useGameStore.getState()
-    if(starPosition){
+    const {star, isTwirling } = useGameStore.getState()
+    if(star){
       delay.current -= isTwirling ? 0 : delta;
     }
-    if(starPosition && isTwirling){
+    if(star && isTwirling){
       idle.current = false;
+      star.isTwirling = true;
     }
     if(groupRef.current, upperStarRef.current, lowerStarRef.current){
       if(idle.current){
         upperStarRef.current.rotation.z = Math.sin(time.current * animationSpeed) * amplitude;
-        upperStarRef.current.rotation.y = Math.sin(time.current * animationSpeed) * amplitude;
+        // upperStarRef.current.rotation.y = Math.sin(time.current * animationSpeed) * amplitude;
         lowerStarRef.current.rotation.z = Math.cos(time.current * animationSpeed) * amplitude;
-        lowerStarRef.current.rotation.y = Math.cos(time.current * animationSpeed) * amplitude;
+        // lowerStarRef.current.rotation.y = Math.cos(time.current * animationSpeed) * amplitude;
       } else {
         if (timeline.current) {
           
-          timeline.current.time(tweenProgress.current)
           if(timeline.current.progress() < 1){
             
           tweenProgress.current += delta
@@ -67,16 +67,19 @@ export function LaunchStar(props) {
         }
       }
     }
+
+    timeline.current.time(tweenProgress.current)
+
     
     if(delay.current <= 0){
-      setStarPosition(null);
+      setStar(null);
     }
 
   })
   return (
     <group  {...props}>
       <RigidBody sensor type="fixed" name="star" userData={{ star: true }} onIntersectionEnter={() =>{
-        setStarPosition(lowerStarRef.current);
+        setStar(lowerStarRef.current);
       }} onIntersectionExit={() => {
         delay.current = 2;
         tweenProgress.current = 0;

@@ -19,6 +19,7 @@ import { Composer } from "./Composer";
 import { LaunchStar } from "./models/launchStar/LaunchStar";
 import { World } from "./models/world/GALAXY-WORLD";
 import { Path } from "./Path";
+import { Particles } from "./Particles";
 
 function App() {
   const controls = [
@@ -37,6 +38,7 @@ function App() {
         <Canvas shadows>
           <Suspense fallback={"loading..."}>
             {/* <Composer/> */}
+            <Particles />
             <Lighting />
             <Dust />
             <Luma />
